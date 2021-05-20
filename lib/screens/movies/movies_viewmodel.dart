@@ -1,24 +1,25 @@
 import 'dart:async';
 
+import 'package:flutter_app/mappers/movie_mapper.dart';
 import 'package:flutter_app/repository/model/movie.dart';
 import 'package:flutter_app/repository/movie_repository.dart';
 
 class MoviesViewModel {
 
-  var repo = MovieRepository();
+  var _repo = MovieRepository();
+  var _mapper = MovieMapper();
 
   var _movies = StreamController<List<Movie>>.broadcast();
-
-  Stream get movies => _movies.stream;
+  Stream<List<Movie>> get movies => _movies.stream;
 
   void dispose() => _movies.close();
 
   void getPopularMovies() async {
-    var popularMovies = await repo.getPopularMovies();
-    List<int> favorites = await repo.findAllFavorites();
+    var popularMovies = await _repo.getPopularMovies();
+    List<int> favorites = await _repo.findAllFavorites();
     var movies = popularMovies.map((tmdbMovie) =>
         _mapper.fromTmdbMovie(tmdbMovie, favorites.contains(tmdbMovie.id))).toList();
-    _movies.add(popularMovies);
+    _movies.add(movies);
   }
 
 }
